@@ -7,11 +7,11 @@ def run_python_file(working_directory, file_path, args = []):
         target_filepath = os.path.abspath(os.path.join(working_directory,file_path))
         abs_dir_path = os.path.abspath(working_directory)
         if not target_filepath.startswith(abs_dir_path):
-            return f'Error: Cannot execute "{target_filepath}" as it is outside the permitted working directory'
+            return f'Error: Cannot execute "{file_path}" as it is outside the permitted working directory'
         if not os.path.isfile(target_filepath):
-            return f'Error: File "{target_filepath}" does not exist'
+            return f'Error: File "{file_path}" not found'
         if not target_filepath.endswith(".py"):
-            return f'Error: {target_filepath} is not a Python file.'
+            return f'Error: "{file_path}" is not a Python file.'
         
 
         completed_process = subprocess.run(['python', target_filepath] + args, cwd = abs_dir_path, capture_output = True, text = True, timeout = 30)
@@ -29,7 +29,8 @@ def run_python_file(working_directory, file_path, args = []):
         
         if not output_parts:
             return "No output produced"
+        return "\n".join(output_parts)
     except subprocess.TimeoutExpired:
         return "Error: Execution timed out after 30 seconds"
     except Exception as e:
-        return f"Error: Exception occured during execution: {e}"
+        return f"Error: Exception occurred during execution: {e}"

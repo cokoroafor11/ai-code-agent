@@ -3,8 +3,8 @@ import sys
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-
-
+from functions.get_files_info import schema_get_files_info
+from prompts import system_prompt
 
 def main():
     load_dotenv()
@@ -23,9 +23,16 @@ def main():
         sys.exit(1)
     messages = [
     types.Content(role="user", parts=[types.Part(text=user_prompt)]),
-]
+]   
+    available_functions = types.Tool(
+    function_declarations=[
+        schema_get_files_info,
+    ]
+)
+    system_prompt = os.environ.get("SYSTEM_PROMPT")
     response = client.models.generate_content(
-    model='gemini-2.0-flash', contents=messages
+    model='gemini-2.0-flash', contents=messages, 
+    config = types.GenerateContentConfig(system_instruction=system_prompt)
     )
     print(response.text)
     if verbose_mode == True:
